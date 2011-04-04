@@ -30,6 +30,13 @@ class Bun {
     private $route_matched = FALSE;
 
     private $path;
+
+    /**
+     * Array containing data to pass to the template file. 
+     * 
+     * @var array
+     */
+    private $view_data = array();
     
     /**
      * Static variable containing the bun.
@@ -86,6 +93,50 @@ class Bun {
     }
 
     /**
+     * Render template file using the specified engine. 
+     * 
+     * @param string $engine 
+     * @param string $template 
+     * @param array $data 
+     * @return string
+     */
+    public static function render($engine, $template, $data = array())
+    {    
+        $bun = Bun::instance();
+        $bun->view_data = $data;
+
+        switch ($engine) {
+            case 'mustache':
+                return $bun->renderWithMustache($template);
+                break;
+            
+            default:
+                return $bun->renderWithPhp($template);
+                break;
+        }
+    }
+
+    private function renderWithPhp($template)
+    {
+        $bun = Bun::instance();
+        
+        // Start output buffering
+        ob_start();
+        
+        // Extract view data array to local variables
+        extract($bun->view_data);
+        
+        // Unset the bun
+        unset($bun);
+
+        // Include the template
+        include($template);
+
+        // Flush and return the buffer.
+        return ob_get_flush();
+    }
+
+    /**
      * Matches the route with the curent path. 
      * 
      * @param string $path 
@@ -118,10 +169,11 @@ class Bun {
      * Get the arguments from the path.
      * 
      * @param string $path 
-     * @return Array
+     * @return array
      */
     private function getArguments($path)
     {
+        // Get bun
         $bun = Bun::instance();
         return array_diff(explode('/', $bun->path), explode('/', $path));
     }
@@ -129,7 +181,7 @@ class Bun {
     /**
      * Get the current url.
      * 
-     * @return string
+     * @return stdClass
      */
     public function getCurrentUrl()
     {
@@ -143,7 +195,7 @@ class Bun {
     /**
      * Turns an array to an object and returns it. 
      * 
-     * @param Array $array 
+     * @param array $array 
      * @return stdClass
      */
     private function arrayToObject(Array $array)
@@ -208,4 +260,29 @@ function put($path, $callback) {
  */
 function delete($path, $callback) {
     Bun::route('DELETE', $path, $callback);
+}
+
+/**
+ * Render a Mustache template. 
+ * 
+ * @param string $template 
+ * @param array $data 
+ * @access public
+ * @return void
+ */
+function mustache($template, $data = array())
+{
+    echo Bun::render('mustache', $template, $data);
+}
+
+/**
+ * Render a PHP template. 
+ * 
+ * @param string $template 
+ * @param array $data 
+ * @access public
+ * @return void
+ */
+function render($template, $data = array()) {
+    echo Bun::render('php', $template, $data); 
 }
