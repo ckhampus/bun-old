@@ -27,8 +27,8 @@ if (!file_exists('.htaccess')) {
  * @access public
  * @return void
  */
-function get($path, $callback) {
-    $GLOBALS['bun']->route('GET', $path, $callback);
+function get($path, $callback, $lifetime = 0) {
+    $GLOBALS['bun']->route('GET', $path, $callback, $lifetime);
 }
 
 /**
@@ -39,8 +39,8 @@ function get($path, $callback) {
  * @access public
  * @return void
  */
-function post($path, $callback) {
-    $GLOBALS['bun']->route('POST', $path, $callback);
+function post($path, $callback, $lifetime = 0) {
+    $GLOBALS['bun']->route('POST', $path, $callback, $lifetime);
 }
 
 /**
@@ -51,8 +51,8 @@ function post($path, $callback) {
  * @access public
  * @return void
  */
-function put($path, $callback) {
-    $GLOBALS['bun']->route('PUT', $path, $callback);
+function put($path, $callback, $lifetime = 0) {
+    $GLOBALS['bun']->route('PUT', $path, $callback, $lifetime);
 }
 
 /**
@@ -63,8 +63,8 @@ function put($path, $callback) {
  * @access public
  * @return void
  */
-function delete($path, $callback) {
-    $GLOBALS['bun']->route('DELETE', $path, $callback);
+function delete($path, $callback, $lifetime = 0) {
+    $GLOBALS['bun']->route('DELETE', $path, $callback, $lifetime);
 }
 
 /**
@@ -77,7 +77,7 @@ function delete($path, $callback) {
  */
 function mustache($template, $data = array())
 {
-    echo Bun::render('mustache', $template, $data);
+    echo $GLOBALS['bun']->render('mustache', $template, $data);
 }
 
 /**
@@ -89,5 +89,5 @@ function mustache($template, $data = array())
  * @return void
  */
 function render($template, $data = array()) {
-    echo Bun::render('php', $template, $data); 
+    echo $GLOBALS['bun']->render('php', $template, $data); 
 }

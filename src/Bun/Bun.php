@@ -1,5 +1,7 @@
 <?php
 
+require_once('Cache.php');
+
 /**
  * Bun
  *
@@ -36,23 +38,30 @@ class Bun {
      * @param callback $callback 
      * @return void
      */
-    public function route($method, $path, $callback)
+    public function route($method, $path, $callback, $lifetime = 0)
     {
-        
         // Check if a route already has been matched
-        if ($this->route_matched) {
-            return FALSE;
-        }      
-        
-        if ($method === $_SERVER['REQUEST_METHOD']) {
-            if ($this->matchRoute($path)) {
-                // Call function with arguments.
-                call_user_func($callback, $this->getArguments($path));
+        if (!$this->route_matched) {
+            $cache = new Cache($path, $lifetime);   
+
+            if ($method === $_SERVER['REQUEST_METHOD']) {
+                if ($this->matchRoute($path)) {
+                    
+                    // Check if page is cached or not
+                    if (!$cache->start()) {
+                        // Call function with arguments.
+                        call_user_func_array($callback, $this->getArguments($path));
+
+                        $cache->end();
+                    }
                 
-                // Route has been matched, stop matchin!
-                return $this->route_matched = TRUE;
+                    // Route has been matched, stop matchin!
+                    return $this->route_matched = TRUE;
+                }
             }
         }
+
+        return FALSE;
     }
 
     /**
@@ -70,28 +79,24 @@ class Bun {
         switch ($engine) {
             case 'mustache':
                 return $this->renderWithMustache($template);
-                break;
-            
+            case 'php':
             default:
                 return $this->renderWithPhp($template);
-                break;
         }
     }
 
     private function renderWithPhp($template)
     {
-
+        extract($this->view_data);
+        
         // Start output buffering
         ob_start();
         
-        // Extract view data array to local variables
-        extract($this->view_data);
-
         // Include the template
         include($template);
 
         // Flush and return the buffer.
-        return ob_get_flush();
+        return ob_get_clean();
     }
 
     /**
