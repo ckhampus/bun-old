@@ -8,10 +8,10 @@ class Cache {
     private $lifetime;
     private $filename;
 
-    function __construct($id, $lifetime) {
+    function __construct($id, $lifetime, $dir = './cache') {
         $this->id = md5($id);
         $this->lifetime = $lifetime;
-        $this->filename = sprintf('%s/%s.tmp', realpath('./cache'), $this->id);
+        $this->filename = sprintf('%s/%s.tmp', realpath($dir), $this->id);
     }
 
     /**

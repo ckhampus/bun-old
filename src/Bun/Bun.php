@@ -2,6 +2,8 @@
 
 require_once('Cache.php');
 
+require_once(realpath(__DIR__.'/../../vendor/mustache/Mustache.php'));
+
 /**
  * Bun
  *
@@ -85,13 +87,39 @@ class Bun {
         }
     }
 
+    private function renderWithMustache($template)
+    {
+        if (class_exists('Mustache')) {
+            $mustache = new Mustache();
+
+            $partials = array();
+
+            foreach ($this->view_data as $key => $value) {
+                $partial = realpath($value);
+
+                if (file_exists($partial)) {
+                    $partials[$key] = file_get_contents($partial);
+                    unset($this->view_data[$key]);
+                }
+            }
+
+            return $mustache->render(file_get_contents(realpath($template)), $this->view_data, $partials);
+        }
+    }
+
     private function renderWithPhp($template)
     {
+        // Extract variables in to the
+        // local scope for use in template.
         extract($this->view_data);
         
         // Start output buffering
         ob_start();
         
+        set_error_handler(function($errno, $errstr) {
+            
+        }, E_NOTICE);
+
         // Include the template
         include($template);
 

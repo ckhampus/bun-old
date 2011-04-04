@@ -123,18 +123,41 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
     /**
      * @todo Implement testRender().
      */
-    public function testRender()
+    public function testPhpRendering()
     {
-        // The expected output of the render function.
-        $output_with_data = '<h1>Hello, World!</h1>';
-        $output_without_data = '<h1></h1>';
-
         // The data passed to the output function.
         $data = array(
             'heading' => 'Hello, World!'
         );
-        
-        $this->assertContains($output_with_data, $this->bun->render('php', __DIR__.'/../template.php', $data));
-        $this->assertContains($output_without_data, $this->bun->render('php', __DIR__.'/../template.php'));
+
+        // The expected output of the render function.
+        $output_with_data = array('tag' => 'h1', 'content' => $data['heading']);
+        $output_without_data = array('tag' => 'h1');
+
+                
+        $this->assertTag($output_with_data, $this->bun->render('php', __DIR__.'/../template.php', $data));
+        $this->assertTag($output_without_data, $this->bun->render('php', __DIR__.'/../template.php'));
+        $this->assertNotTag($output_with_data, $this->bun->render('php', __DIR__.'/../template.php'));
     }   
+
+    /**
+     * @todo Implement testRender().
+     */
+    public function testMustacheRendering()
+    {
+        // The data passed to the output function.
+        $data = array(
+            'heading' => 'Hello, World!'
+        );
+
+        // The expected output of the render function.
+        $output_with_data = array('tag' => 'h1', 'content' => $data['heading']);
+        $output_without_data = array('tag' => 'h1');
+
+                
+        $this->assertTag($output_with_data, $this->bun->render('mustache', __DIR__.'/../template.html', $data));
+        $this->assertTag($output_without_data, $this->bun->render('mustache', __DIR__.'/../template.html'));
+        $this->assertNotTag($output_with_data, $this->bun->render('mustache', __DIR__.'/../template.html'));
+    }   
+
 }
