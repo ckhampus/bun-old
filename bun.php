@@ -4,7 +4,7 @@
  *
  * @author Cristian Hampus
  * @version 0.0.1
- * @copyright Me, 04 April, 2011
+ * @copyright Cristian Hampus, 04 April, 2011
  * @package Bun
  */
 
@@ -15,13 +15,21 @@ if (!file_exists('.htaccess')) {
     //throw new Exception('Bun needs an .htaccess file to work properly.');
 }
 
+/**
+ * Bun
+ *
+ * The Bun class is the main class of the
+ * framework. It does most of the heavy lifting.
+ */
 class Bun {
     /**
-     * True of route has been matched.  
+     * True if a route has been matched.  
      * 
      * @var bool
      */
     private $route_matched = FALSE;
+
+    private $path;
     
     /**
      * Static variable containing the bun.
@@ -31,7 +39,8 @@ class Bun {
     private static $instance = NULL;
 
     private function __construct() {
-        
+        // Get the reqested path
+        $this->path = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : '/';
     }
 
     /**
@@ -57,23 +66,71 @@ class Bun {
      */
     public static function route($method, $path, $callback)
     {
+        // Get bun
         $bun = Bun::instance();
-
+        
+        // Check if a route already has been matched
         if ($bun->route_matched) {
             return FALSE;
-        }
-
-        $requested_path = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : '/';
-
+        }      
+        
         if ($method === $_SERVER['REQUEST_METHOD']) {
-            if ($path === $requested_path) {
-                call_user_func($callback);
-
+            if ($bun->matchRoute($path)) {
+                // Call function with arguments.
+                call_user_func($callback, $bun->getArguments($path));
+                
+                // Route has been matched, stop matchin!
                 return $bun->route_matched = TRUE;
             }
         }
     }
 
+    /**
+     * Matches the route with the curent path. 
+     * 
+     * @param string $path 
+     * @return bool
+     */
+    private function matchRoute($path)
+    {
+        // Get bun
+        $bun = Bun::instance();
+
+        // Contains regular expressions to replace
+        $regexp = array(
+            '/:[a-zA-Z_][a-zA-Z0-9_]*/' => '[\w]+',
+            '/\*/' => '.+'
+        );
+
+        // Prepare the string
+        $path = str_replace('/', '\/', $path);
+        
+        // Replace the reqular expressions
+        foreach ($regexp as $key => $value) {
+            $path = preg_replace($key, $value, $path);
+        }
+        
+        // Matches the route with the current path
+        return preg_match(sprintf('/^%s$/', $path), $bun->path);
+    }
+
+    /**
+     * Get the arguments from the path.
+     * 
+     * @param string $path 
+     * @return Array
+     */
+    private function getArguments($path)
+    {
+        $bun = Bun::instance();
+        return array_diff(explode('/', $bun->path), explode('/', $path));
+    }
+
+    /**
+     * Get the current url.
+     * 
+     * @return string
+     */
     public function getCurrentUrl()
     {
         $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https' : 'http';
@@ -102,7 +159,7 @@ class Bun {
 }
 
 /**
- *  The public API for the framework. 
+ *  Below comes the public API for the framework. 
  */
 
 /**
