@@ -56,7 +56,6 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
         );
 
 
-        $this->bun = new Bun();
     }
 
     /**
@@ -65,59 +64,111 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
      */
     protected function tearDown()
     {
-        unset($this->bun);
+
     }
 
     /**
-     * @todo Implement testRoute().
+     * Test successful GET routing.
      */
-    public function testGetRoute()
+    public function testSuccessfulGetRoute()
     {
+        $bun = new Bun();
+
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
-        $this->assertTrue($this->bun->route('GET', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('POST', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('PUT', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('DELETE', '/hello', function() {}));
+        $this->assertTrue($bun->route('GET', '/hello', function() {}));
+        $this->assertTrue($bun->router());
     }
 
     /**
-     * @todo Implement testRoute().
+     * Test unsuccessful GET routing.
+     * 
+     * @depends testSuccessfulGetRoute
      */
-    public function testPostRoute()
+    public function testUnsuccessfulGetRoute()
+    {
+        $bun = new Bun();
+
+        $this->assertTrue($bun->route('GET', '/world', function() {}));
+        $this->assertFalse($bun->router());
+    }
+
+    /**
+     * Test successful POST routing.
+     */
+    public function testSuccessfulPostRoute()
     {    
+        $bun = new Bun();
+
         $_SERVER['REQUEST_METHOD'] = 'POST';
 
-        $this->assertFalse($this->bun->route('GET', '/hello', function() {}));
-        $this->assertTrue($this->bun->route('POST', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('PUT', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('DELETE', '/hello', function() {}));
+        $this->assertTrue($bun->route('POST', '/hello', function() {}));
+        $this->assertTrue($bun->router());
     }
 
     /**
-     * @todo Implement testRoute().
+     * Test unsuccessful POST routing. 
+     * 
+     * @depends testSuccessfulPostRoute
      */
-    public function testPutRoute()
+    public function testUnsuccessfulPostRoute()
+    {
+        $bun = new Bun();
+
+        $this->assertTrue($bun->route('POST', '/world', function() {}));
+        $this->assertFalse($bun->router());
+    }
+
+    /**
+     * Test successful PUT routing.
+     */
+    public function testSuccessfulPutRoute()
     {    
+        $bun = new Bun();
+
         $_SERVER['REQUEST_METHOD'] = 'PUT';
 
-        $this->assertFalse($this->bun->route('GET', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('POST', '/hello', function() {}));
-        $this->assertTrue($this->bun->route('PUT', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('DELETE', '/hello', function() {}));
+        $this->assertTrue($bun->route('PUT', '/hello', function() {}));
+        $this->assertTrue($bun->router());
     }
 
     /**
-     * @todo Implement testRoute().
+     * Test unsuccessful PUT routing.
+     * 
+     * @depends testSuccessfulPutRoute
      */
-    public function testDeleteRoute()
+    public function testUnsuccessfulPutRoute()
+    {
+        $bun = new Bun();
+
+        $this->assertTrue($bun->route('PUT', '/world', function() {}));
+        $this->assertFalse($bun->router());
+    }
+
+    /**
+     * Test successful DELETE routing.
+     */
+    public function testSuccessfulDeleteRoute()
     {    
+        $bun = new Bun();
+
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
 
-        $this->assertFalse($this->bun->route('GET', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('POST', '/hello', function() {}));
-        $this->assertFalse($this->bun->route('PUT', '/hello', function() {}));
-        $this->assertTrue($this->bun->route('DELETE', '/hello', function() {}));
+        $this->assertTrue($bun->route('DELETE', '/hello', function() {}));
+        $this->assertTrue($bun->router());
+    }
+
+    /**
+     * Test unsuccessful DELETE routing.
+     * 
+     * @depends testSuccessfulDeleteRoute
+     */
+    public function testUnsuccessfulDeleteRoute()
+    {
+        $bun = new Bun();
+
+        $this->assertTrue($bun->route('PUT', '/world', function() {}));
+        $this->assertFalse($bun->router());
     }
 
     /**
@@ -125,6 +176,8 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
      */
     public function testPhpRendering()
     {
+        $bun = new Bun();
+
         // The data passed to the output function.
         $data = array(
             'heading' => 'Hello, World!'
@@ -135,9 +188,9 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
         $output_without_data = array('tag' => 'h1');
 
                 
-        $this->assertTag($output_with_data, $this->bun->render('php', __DIR__.'/../template.php', $data));
-        $this->assertTag($output_without_data, $this->bun->render('php', __DIR__.'/../template.php'));
-        $this->assertNotTag($output_with_data, $this->bun->render('php', __DIR__.'/../template.php'));
+        $this->assertTag($output_with_data, $bun->render('php', __DIR__.'/../template.php', $data));
+        $this->assertTag($output_without_data, $bun->render('php', __DIR__.'/../template.php'));
+        $this->assertNotTag($output_with_data, $bun->render('php', __DIR__.'/../template.php'));
     }   
 
     /**
@@ -145,6 +198,8 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
      */
     public function testMustacheRendering()
     {
+        $bun = new Bun();
+
         // The data passed to the output function.
         $data = array(
             'heading' => 'Hello, World!'
@@ -155,9 +210,9 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
         $output_without_data = array('tag' => 'h1');
 
                 
-        $this->assertTag($output_with_data, $this->bun->render('mustache', __DIR__.'/../template.html', $data));
-        $this->assertTag($output_without_data, $this->bun->render('mustache', __DIR__.'/../template.html'));
-        $this->assertNotTag($output_with_data, $this->bun->render('mustache', __DIR__.'/../template.html'));
+        $this->assertTag($output_with_data, $bun->render('mustache', __DIR__.'/../template.html', $data));
+        $this->assertTag($output_without_data, $bun->render('mustache', __DIR__.'/../template.html'));
+        $this->assertNotTag($output_with_data, $bun->render('mustache', __DIR__.'/../template.html'));
     }
 
     public function testCountRoute()

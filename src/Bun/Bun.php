@@ -98,7 +98,7 @@ class Bun {
             }
         }
 
-        return FALSE;
+        return TRUE;
     }
 
     /**
@@ -118,7 +118,6 @@ class Bun {
                     if (!$cache->start()) {
                         // Call function with arguments.
                         call_user_func_array($route['callback'], $this->getArguments($route['path']));
-
                         $cache->end();
                     }
             
