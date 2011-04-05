@@ -1,7 +1,6 @@
 <?php
 
 require_once('Cache.php');
-
 require_once(realpath(__DIR__.'/../../vendor/mustache/Mustache.php'));
 
 /**
@@ -18,7 +17,19 @@ class Bun {
      */
     private $route_matched = FALSE;
 
-    private $path;
+    /**
+     * Contains the number of defined routes. 
+     * 
+     * @var int
+     */
+    private $number_of_routes = 0;
+
+    /**
+     * The currently requested path. 
+     * 
+     * @var string
+     */
+    private $requested_path = '/';
 
     /**
      * Array containing data to pass to the template file. 
@@ -28,8 +39,8 @@ class Bun {
     private $view_data = array();
     
     function __construct() {
-        // Get the reqested path
-        $this->path = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : '/';
+        // Get the requested path
+        $this->requested_path = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : '/';
     }
 
     /**
@@ -87,6 +98,41 @@ class Bun {
         }
     }
 
+    /**
+     * Count and return the number of defined routes. 
+     * 
+     * @return int
+     */
+    public function countRoutes()
+    {
+        $app_file = file_get_contents($_SERVER['SCRIPT_FILENAME']);
+
+        $tokens = token_get_all($app_file);
+        
+        foreach ($tokens as $token) {
+            if (is_array($token)) {
+                if ($token[0] == T_STRING) {
+                    switch ($token[1]) {
+                        case 'get':
+                        case 'post':
+                        case 'put':
+                        case 'delete':
+                            $this->number_of_routes += 1;
+                            break;
+                    }
+                }
+            }
+        }
+
+        return $this->number_of_routes;
+    }
+
+    /**
+     * Render Mustache template. 
+     * 
+     * @param string $template 
+     * @return string
+     */
     private function renderWithMustache($template)
     {
         if (class_exists('Mustache')) {
@@ -107,6 +153,12 @@ class Bun {
         }
     }
 
+    /**
+     * Render PHP template. 
+     * 
+     * @param string $template 
+     * @return string
+     */
     private function renderWithPhp($template)
     {
         // Extract variables in to the
@@ -150,7 +202,7 @@ class Bun {
         }
         
         // Matches the route with the current path
-        return preg_match(sprintf('/^%s$/', $path), $this->path);
+        return preg_match(sprintf('/^%s$/', $path), $this->requested_path);
     }
 
     /**
@@ -163,7 +215,7 @@ class Bun {
     {
         // Get bun
         //$bun = Bun::instance();
-        return array_diff(explode('/', $this->path), explode('/', $path));
+        return array_diff(explode('/', $this->requested_path), explode('/', $path));
     }
 
     /**

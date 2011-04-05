@@ -91,3 +91,5 @@ function mustache($template, $data = array())
 function render($template, $data = array()) {
     echo $GLOBALS['bun']->render('php', $template, $data); 
 }
+
+$GLOBALS['bun']->countRoutes();
