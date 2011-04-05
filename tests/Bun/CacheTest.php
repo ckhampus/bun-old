@@ -21,8 +21,7 @@ class CacheTest extends PHPUnit_Extensions_OutputTestCase
      */
     protected function setUp()
     {
-        $this->lifetime = 2;
-        $this->time = time();
+        $this->lifetime = 30;
         $this->expire = $this->time + $this->lifetime;
         
     }
@@ -39,7 +38,8 @@ class CacheTest extends PHPUnit_Extensions_OutputTestCase
      */
     protected function tearDown()
     {
-        
+        //$c = new Cache('test', $this->lifetime, self::$dir);
+        //$c->destroy();
     }
 
     public static function tearDownAfterClass()
@@ -57,48 +57,71 @@ class CacheTest extends PHPUnit_Extensions_OutputTestCase
         }
     }
 
+    public function testIsCached()
+    {
+        $c = new Cache('test', $this->lifetime, self::$dir);
+        
+        // Returns false if there is no cache file.
+        $this->assertFalse($c->start());
+        $c->end();
+     
+        // Returns true if there is a cache file.
+        $this->assertTrue($c->start());
+        $this->assertTrue($c->destroy());
+    }
+
     /**
      * Test cache by caching current time. 
      */
-    public function testCacheOne()
+    public function testCacheOutput()
     {
-        $cache = new Cache('test', $this->lifetime, 'tests/cache');
+        $c = new Cache('test', $this->lifetime, 'tests/cache');
         
-        $this->expectOutputString($this->time);
-        if (!$cache->start()) {
-            $this->time;            
-            $cache->end();
+        // Start output buffering
+        ob_start();
+
+        if (!$c->start()) {
+            echo time();            
+            $c->end();
         }
+
+        // Stop output buffering
+        $output = ob_get_clean();
+
+        $this->assertEquals(time(), $output);
+
+        sleep(2);
     }
 
     /**
-     * Test if the time still is cached. 
+     * Test the out that has been cached in the previous test.
+     * 
+     * @depends testCacheOutput
      */
-    public function testCacheTwo()
+    public function testCachedOutput()
     {
-        $cache = new Cache('test', $this->lifetime, 'tests/cache');
+        $c = new Cache('test', $this->lifetime, 'tests/cache');
         
-        $this->expectOutputString($this->time);
-        if (!$cache->start()) {
-            $this->time;            
-            $cache->end();
-        }
+        // Start output buffering
+        ob_start();
 
-        sleep($this->lifetime);
+        $this->assertTrue($c->start());
+
+        // Stop output buffering
+        $output = ob_get_clean();
+
+        $this->assertNotEquals((string)time(), $output);
     }
 
     /**
-     * Test if cache has been cleared.
+     * Tests if the cache can be destroyed.
+     * 
+     * @depends testCachedOutput
      */
-    public function testCacheTree()
+    public function testDestroyCache()
     {
-        $cache = new Cache('test', $this->lifetime, 'tests/cache');
-        
-        $this->expectOutputString(time());
-        if (!$cache->start()) {
-            time();            
-            $cache->end();
-        }
+        $c = new Cache('test', $this->lifetime, 'tests/cache');
+        $this->assertTrue($c->destroy());
+        $this->assertFalse($c->destroy());
     }
-
 }

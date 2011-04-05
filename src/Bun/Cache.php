@@ -14,6 +14,15 @@ class Cache {
         $this->filename = sprintf('%s/%s.tmp', realpath($dir), $this->id);
     }
 
+    public function destroy()
+    {
+        if (file_exists($this->filename)) {
+            return unlink($this->filename);
+        }
+
+        return FALSE;
+    }
+
     /**
      * Start the caching process.
      * 
