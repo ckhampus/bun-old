@@ -41,7 +41,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
             'REMOTE_ADDR' => '192.168.0.100',
             'DOCUMENT_ROOT' => '/home/user/www',
             'SERVER_ADMIN' => 'webmaster@example.com',
-            'SCRIPT_FILENAME' => __DIR__.'index.php',
+            'SCRIPT_FILENAME' => __DIR__.'/index.php',
             'REMOTE_PORT' => '57576',
             'GATEWAY_INTERFACE' => 'CGI/1.1',
             'SERVER_PROTOCOL' => 'HTTP/1.1',
@@ -158,6 +158,14 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
         $this->assertTag($output_with_data, $this->bun->render('mustache', __DIR__.'/../template.html', $data));
         $this->assertTag($output_without_data, $this->bun->render('mustache', __DIR__.'/../template.html'));
         $this->assertNotTag($output_with_data, $this->bun->render('mustache', __DIR__.'/../template.html'));
-    }   
+    }
+
+    public function testCountRoute()
+    {
+        $_SERVER['SCRIPT_FILENAME'] = __DIR__.'/../mock_index.php';
+
+        $bun = new Bun();
+        $this->assertEquals(5, $bun->countRoutes());
+    }
 
 }

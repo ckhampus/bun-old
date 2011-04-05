@@ -1,19 +1,37 @@
 <?php
 
+
 /**
- * Cache
- **/
+ * Cache 
+ *
+ * Simple cache class.
+ *
+ * @package Core
+ */
 class Cache {    
     private $id;
     private $lifetime;
     private $filename;
 
+    /**
+     * Create a new cache. 
+     * 
+     * @param mixed $id 
+     * @param int $lifetime 
+     * @param string $dir 
+     * @access public
+     */
     function __construct($id, $lifetime, $dir = './cache') {
         $this->id = md5($id);
         $this->lifetime = $lifetime;
         $this->filename = sprintf('%s/%s.tmp', realpath($dir), $this->id);
     }
 
+    /**
+     * Destroy and clears the cache.
+     * 
+     * @return bool
+     */
     public function destroy()
     {
         if (file_exists($this->filename)) {
@@ -37,8 +55,6 @@ class Cache {
                 $cached_time = DateTime::createFromFormat(DateTime::RFC2822, $cached_file[0]);
 
                 if ($current_time < $cached_time) {
-
-                    
                     if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
                         $if_modified_since = DateTime::createFromFormat(DateTime::RFC2822, $_SERVER['HTTP_IF_MODIFIED_SINCE']);
                      

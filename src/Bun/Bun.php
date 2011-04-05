@@ -8,6 +8,8 @@ require_once(realpath(__DIR__.'/../../vendor/mustache/Mustache.php'));
  *
  * The Bun class is the main class of the
  * framework. It does most of the heavy lifting.
+ *
+ * @package Core
  */
 class Bun {
     /**
@@ -25,11 +27,25 @@ class Bun {
     private $number_of_routes = 0;
 
     /**
+     * The number of how many routes have been executed. 
+     * 
+     * @var int
+     */
+    private $routes_executed = 0;
+
+    /**
      * The currently requested path. 
      * 
      * @var string
      */
     private $requested_path = '/';
+
+    /**
+     * Array containing all routes. 
+     * 
+     * @var array
+     */
+    private $routes = array();
 
     /**
      * Array containing data to pass to the template file. 
@@ -38,6 +54,11 @@ class Bun {
      */
     private $view_data = array();
     
+    /**
+     * Creates an instance of the Bun.
+     * 
+     * @access public
+     */
     function __construct() {
         // Get the requested path
         $this->requested_path = (isset($_SERVER['PATH_INFO'])) ? $_SERVER['PATH_INFO'] : '/';
@@ -53,28 +74,93 @@ class Bun {
      */
     public function route($method, $path, $callback, $lifetime = 0)
     {
-        // Check if a route already has been matched
-        if (!$this->route_matched) {
-            $cache = new Cache($path, $lifetime);   
+        if (!is_int($lifetime)) {
+            return FALSE;
+        }
 
-            if ($method === $_SERVER['REQUEST_METHOD']) {
-                if ($this->matchRoute($path)) {
-                    
+        if (!is_callable($callback)) {
+            return FALSE;
+        }
+
+        array_push($this->routes, array(
+            'method'   => $method,
+            'path'     => $path,
+            'callback' => $callback,
+            'lifetime' => $lifetime
+        ));
+        
+        $this->routes_executed++;
+
+        if ($this->number_of_routes == $this->routes_executed) {
+            if (!$this->router()) {
+                $this->notFound();
+                return FALSE;
+            }
+        }
+
+        return FALSE;
+    }
+
+    /**
+     * Handles the routing.
+     * 
+     * @return void
+     */
+    public function router()
+    {
+        foreach ($this->routes as $route) {
+            $cache = new Cache($route['path'], $route['lifetime']);   
+
+            if ($route['method'] === $_SERVER['REQUEST_METHOD']) {
+                if ($this->matchRoute($route['path'])) {
+                 
                     // Check if page is cached or not
                     if (!$cache->start()) {
                         // Call function with arguments.
-                        call_user_func_array($callback, $this->getArguments($path));
+                        call_user_func_array($route['callback'], $this->getArguments($route['path']));
 
                         $cache->end();
                     }
-                
+            
                     // Route has been matched, stop matchin!
                     return $this->route_matched = TRUE;
                 }
             }
         }
-
+        
         return FALSE;
+    }
+
+    /**
+     * Error handler for page not found error. 
+     * 
+     * @return void
+     */
+    public function notFound()
+    {
+        echo 'Page not found';
+    }
+
+    /**
+     * Set error handler for specific status codes. 
+     * 
+     * @param int $status 
+     * @param callback $callback
+     */
+    public function errorHandler($status, $callback)
+    {
+        // code...
+    }
+
+    /**
+     * Redirect to location. 
+     * 
+     * @param string $location 
+     * @param int $status 
+     */
+    public function redirect($location, $status)
+    {
+        
     }
 
     /**
@@ -117,7 +203,7 @@ class Bun {
                         case 'post':
                         case 'put':
                         case 'delete':
-                            $this->number_of_routes += 1;
+                            $this->number_of_routes++;
                             break;
                     }
                 }

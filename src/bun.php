@@ -1,11 +1,6 @@
 <?php
 /**
- * Bun Framework
- *
- * @author Cristian Hampus
- * @version 0.0.1
- * @copyright Cristian Hampus, 04 April, 2011
- * @package Bun
+ * @package Core 
  */
 
 require_once('Bun/Bun.php');
@@ -23,7 +18,8 @@ if (!file_exists('.htaccess')) {
  * Define a GET handler for path.  
  * 
  * @param string $path 
- * @param callback $callback 
+ * @param callback $callback
+ * @param int $lifetime
  * @access public
  * @return void
  */
@@ -36,6 +32,7 @@ function get($path, $callback, $lifetime = 0) {
  * 
  * @param string $path 
  * @param callback $callback 
+ * @param int $lifetime
  * @access public
  * @return void
  */
@@ -48,6 +45,7 @@ function post($path, $callback, $lifetime = 0) {
  * 
  * @param string $path 
  * @param callback $callback 
+ * @param int $lifetime
  * @access public
  * @return void
  */
@@ -60,6 +58,7 @@ function put($path, $callback, $lifetime = 0) {
  * 
  * @param string $path 
  * @param callback $callback 
+ * @param int $lifetime
  * @access public
  * @return void
  */
