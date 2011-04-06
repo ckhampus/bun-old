@@ -1,6 +1,7 @@
 <?php
 
 require('Cache.php');
+require('Route.php');
 
 /**
  * Bun
@@ -73,20 +74,8 @@ class Bun {
      */
     public function route($method, $path, $callback, $lifetime = 0)
     {
-        if (!is_int($lifetime)) {
-            return FALSE;
-        }
-
-        if (!is_callable($callback)) {
-            return FALSE;
-        }
-
-        array_push($this->routes, array(
-            'method'   => $method,
-            'path'     => $path,
-            'callback' => $callback,
-            'lifetime' => $lifetime
-        ));
+        $route = new Route($method, $path, $callback, $lifetime);
+        $this->routes[] = $route;
         
         $this->routes_executed++;
 
@@ -97,7 +86,7 @@ class Bun {
             }
         }
 
-        return TRUE;
+        return $route;
     }
 
     /**
@@ -108,15 +97,15 @@ class Bun {
     public function router()
     {
         foreach ($this->routes as $route) {
-            $cache = new Cache($route['path'], $route['lifetime']);   
+            $cache = new Cache($route->path, $route->lifetime);   
 
-            if ($route['method'] === $_SERVER['REQUEST_METHOD']) {
-                if ($this->matchRoute($route['path'])) {
+            if ($route->method === $_SERVER['REQUEST_METHOD']) {
+                if ($this->matchRoute($route->path)) {
                  
                     // Check if page is cached or not
                     if (!$cache->start()) {
                         // Call function with arguments.
-                        call_user_func_array($route['callback'], $this->getArguments($route['path']));
+                        call_user_func_array($route->callback, $this->getArguments($route->path));
                         $cache->end();
                     }
             
@@ -219,11 +208,11 @@ class Bun {
      */
     private function renderWithMustache($template)
     {
-        $path = VND_ROOT.'/mustache/Mustache.php';
+        $path = realpath(__DIR__.'/../../vendor/mustache/Mustache.php');
 
         if (!class_exists('Mustache')) {
             
-            if (file_exists($path)) {
+            if (!file_exists($path)) {
                 throw new Exception('Mustache framework could not be loaded');
             }
             

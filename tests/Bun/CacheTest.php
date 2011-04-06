@@ -1,6 +1,6 @@
 <?php
 
-require_once '/home/cristian/www/projects/bun/src/Bun/Cache.php';
+require_once(__DIR__.'/../../src/Bun/Cache.php');
 
 /**
  * Test class for Cache.

@@ -1,5 +1,4 @@
 <?php
-require_once('PHPUnit/Extensions/OutputTestCase.php');
 require_once(__DIR__.'/../../src/Bun/Bun.php');
 
 /**
@@ -76,7 +75,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
-        $this->assertTrue($bun->route('GET', '/hello', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('GET', '/hello', function() {}));
         $this->assertTrue($bun->router());
     }
 
@@ -89,7 +88,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
     {
         $bun = new Bun();
 
-        $this->assertTrue($bun->route('GET', '/world', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('GET', '/world', function() {}));
         $this->assertFalse($bun->router());
     }
 
@@ -102,7 +101,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
 
-        $this->assertTrue($bun->route('POST', '/hello', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('POST', '/hello', function() {}));
         $this->assertTrue($bun->router());
     }
 
@@ -115,7 +114,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
     {
         $bun = new Bun();
 
-        $this->assertTrue($bun->route('POST', '/world', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('POST', '/world', function() {}));
         $this->assertFalse($bun->router());
     }
 
@@ -128,7 +127,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
 
         $_SERVER['REQUEST_METHOD'] = 'PUT';
 
-        $this->assertTrue($bun->route('PUT', '/hello', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('PUT', '/hello', function() {}));
         $this->assertTrue($bun->router());
     }
 
@@ -141,7 +140,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
     {
         $bun = new Bun();
 
-        $this->assertTrue($bun->route('PUT', '/world', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('PUT', '/world', function() {}));
         $this->assertFalse($bun->router());
     }
 
@@ -154,7 +153,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
 
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
 
-        $this->assertTrue($bun->route('DELETE', '/hello', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('DELETE', '/hello', function() {}));
         $this->assertTrue($bun->router());
     }
 
@@ -167,7 +166,7 @@ class BunTest extends PHPUnit_Extensions_OutputTestCase
     {
         $bun = new Bun();
 
-        $this->assertTrue($bun->route('PUT', '/world', function() {}));
+        $this->assertInstanceOf('Route', $bun->route('PUT', '/world', function() {}));
         $this->assertFalse($bun->router());
     }
 
