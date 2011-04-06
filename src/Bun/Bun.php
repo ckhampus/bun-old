@@ -1,7 +1,6 @@
 <?php
 
 require_once('Cache.php');
-require_once(realpath(__DIR__.'/../../vendor/mustache/Mustache.php'));
 
 /**
  * Bun
@@ -220,6 +219,10 @@ class Bun {
      */
     private function renderWithMustache($template)
     {
+        if (!class_exists('Mustache') {
+            include(realpath(__DIR__.'/../../vendor/mustache/Mustache.php'));
+        }
+
         if (class_exists('Mustache')) {
             $mustache = new Mustache();
 
