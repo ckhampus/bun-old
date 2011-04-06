@@ -1,6 +1,6 @@
 <?php
 
-require_once('Cache.php');
+require('Cache.php');
 
 /**
  * Bun
@@ -219,8 +219,15 @@ class Bun {
      */
     private function renderWithMustache($template)
     {
-        if (!class_exists('Mustache') {
-            include(realpath(__DIR__.'/../../vendor/mustache/Mustache.php'));
+        $path = VND_ROOT.'/mustache/Mustache.php';
+
+        if (!class_exists('Mustache')) {
+            
+            if (file_exists($path)) {
+                throw new Exception('Mustache framework could not be loaded');
+            }
+            
+            include($path);
         }
 
         if (class_exists('Mustache')) {
@@ -323,5 +330,3 @@ class Bun {
         return $object;
     }
 }
-
-$GLOBALS['bun'] = new Bun();

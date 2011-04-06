@@ -3,7 +3,16 @@
  * @package Core 
  */
 
-require_once('Bun/Bun.php');
+
+// Define paths for the src and vendor directory
+define('SRC_ROOT', __DIR__);
+define('VND_ROOT', realpath(__DIR__.'/../vendor'));
+
+// Include bun
+require('Bun/Bun.php');
+
+// Create a new bun
+$GLOBALS['bun'] = new Bun();
 
 // Check if htaccess file exists
 if (!file_exists('.htaccess')) {
