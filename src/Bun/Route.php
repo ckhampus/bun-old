@@ -1,7 +1,5 @@
 <?php
 
-require('Base.php');
-
 /**
  * Route 
  *
@@ -94,7 +92,7 @@ class Route extends Base {
      * @param array $values 
      * @return void
      */
-    protected function getPath(Array $values = array()) {
+    public function getRealPath(Array $values = array()) {
         if (empty($values)) {
             $path = str_replace('/', '\/', $this->path);
             $values = array_fill_keys($this->getParameters(), '[\w]+');

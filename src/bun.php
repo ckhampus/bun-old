@@ -3,11 +3,6 @@
  * @package Core 
  */
 
-
-// Define paths for the src and vendor directory
-define('SRC_ROOT', __DIR__);
-define('VND_ROOT', realpath(__DIR__.'/../vendor'));
-
 // Include bun
 require('Bun/Bun.php');
 
@@ -123,20 +118,28 @@ function route($name) {
 }
 
 /**
- * Returns the url for a named route. 
+ * Returns the path for a named route. 
  * 
  * @param string $name 
  * @param mixed $values 
  * @access public
  * @return string
  */
-function urlFor($name, $values = array()) {
-    if (!is_array($values) && !empty(func_get_args())) {
-        $values = array_shift(func_get_args());
+function path($name, $values = array()) {
+    if (!is_array($values) && func_num_args() > 0) {
+        $values = func_get_args();
+        array_shift($values);
     }
     
-    $route = $GLOBALS['bun']->getRouteByName($name);    
+    $route = $GLOBALS['bun']->getRouteByName($name);
+    if ($route->hasParameters() && count($values) === 0) {
+        throw new Exception('Path requires parameters.');
+    }
+    
     return $route->getRealPath($values);
 }
 
 $GLOBALS['bun']->countRoutes();
+
+
+// DOC: (@name|@before) +([a-zA-Z]+)
