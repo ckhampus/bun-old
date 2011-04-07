@@ -33,7 +33,7 @@ if (!file_exists('.htaccess')) {
  * @return void
  */
 function get($path, $callback, $lifetime = 0) {
-    $GLOBALS['bun']->route('GET', $path, $callback, $lifetime);
+    return $GLOBALS['bun']->route('GET', $path, $callback, $lifetime);
 }
 
 /**
@@ -46,7 +46,7 @@ function get($path, $callback, $lifetime = 0) {
  * @return void
  */
 function post($path, $callback, $lifetime = 0) {
-    $GLOBALS['bun']->route('POST', $path, $callback, $lifetime);
+    return $GLOBALS['bun']->route('POST', $path, $callback, $lifetime);
 }
 
 /**
@@ -59,7 +59,7 @@ function post($path, $callback, $lifetime = 0) {
  * @return void
  */
 function put($path, $callback, $lifetime = 0) {
-    $GLOBALS['bun']->route('PUT', $path, $callback, $lifetime);
+    return $GLOBALS['bun']->route('PUT', $path, $callback, $lifetime);
 }
 
 /**
@@ -72,7 +72,7 @@ function put($path, $callback, $lifetime = 0) {
  * @return void
  */
 function delete($path, $callback, $lifetime = 0) {
-    $GLOBALS['bun']->route('DELETE', $path, $callback, $lifetime);
+    return $GLOBALS['bun']->route('DELETE', $path, $callback, $lifetime);
 }
 
 /**
@@ -99,5 +99,24 @@ function mustache($template, $data = array())
 function render($template, $data = array()) {
     echo $GLOBALS['bun']->render('php', $template, $data); 
 }
+
+function name($name) {
+    $GLOBALS['bun']->setRouteName($name);
+}
+
+function route($name) {
+    return $GLOBALS['bun']->getRouteByName($name);
+}
+
+function urlFor($name) {
+    $route = $GLOBALS['bun']->getRouteByName($name);
+    
+    $data = func_get_args();
+    array_shift($data);
+    
+    return $route->generateUrl($data);
+}
+
+
 
 $GLOBALS['bun']->countRoutes();

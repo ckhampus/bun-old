@@ -17,42 +17,44 @@ class Bun {
      * 
      * @var bool
      */
-    private $route_matched = FALSE;
+    protected $route_matched = FALSE;
 
     /**
      * Contains the number of defined routes. 
      * 
      * @var int
      */
-    private $number_of_routes = 0;
+    protected $number_of_routes = 0;
 
     /**
      * The number of how many routes have been executed. 
      * 
      * @var int
      */
-    private $routes_executed = 0;
+    protected $routes_executed = 0;
 
     /**
      * The currently requested path. 
      * 
      * @var string
      */
-    private $requested_path = '/';
+    protected $requested_path = '/';
 
     /**
      * Array containing all routes. 
      * 
      * @var array
      */
-    private $routes = array();
+    protected $routes = array();
 
     /**
      * Array containing data to pass to the template file. 
      * 
      * @var array
      */
-    private $view_data = array();
+    protected $view_data = array();
+    
+    protected $name_for_new_route = NULL;
     
     /**
      * Creates an instance of the Bun.
@@ -75,6 +77,12 @@ class Bun {
     public function route($method, $path, $callback, $lifetime = 0)
     {
         $route = new Route($method, $path, $callback, $lifetime);
+        
+        if (!is_null($this->name_for_new_route)) {
+            $route->name = $this->name_for_new_route;
+            $this->name_for_new_route = NULL;
+        }
+        
         $this->routes[] = $route;
         
         $this->routes_executed++;
@@ -87,6 +95,20 @@ class Bun {
         }
 
         return $route;
+    }
+    
+    public function setRouteName($name) {
+        $this->name_for_new_route = $name;
+    }
+    
+    public function getRouteByName($name) {
+        foreach ($this->routes as $route) {
+            if ($route->name === $name) {
+                return $route;
+            }
+        }
+        
+        return FALSE;
     }
 
     /**
@@ -264,7 +286,7 @@ class Bun {
     }
 
     /**
-     * Matches the route with the curent path. 
+     * Matches the route with the current path. 
      * 
      * @param string $path 
      * @return bool

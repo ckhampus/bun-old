@@ -2,12 +2,7 @@
 
 require('Base.php');
 
-class Route extends Base {
-    public $method;
-    public $path;
-    public $callback;
-    public $lifetime;
-    
+class Route extends Base {    
     function __construct($method, $path, $callback, $lifetime = 0) {
         if (!in_array(strtoupper($method), array('GET', 'POST', 'PUT', 'DELETE'))) {
             throw new InvalidArgumentException('Method not supported.');
@@ -38,25 +33,55 @@ class Route extends Base {
         $this->lifetime = $lifetime;
     }
     
-    public function name($name) {
-        $this->name = $name;
+    public function hasParameters() {
+        $count = 0;
+    
+        // Contains regular expressions to replace
+        $regexp = array(
+            '/:[a-zA-Z_][a-zA-Z0-9_]*/' => '[\w]+',
+            '/\*/' => '.+'
+        );
+
+        // Prepare the string
+        $path = str_replace('/', '\/', $this->path);
         
-        return $this;
+        // Replace the reqular expressions
+        foreach ($regexp as $key => $value) {
+            if (preg_match($key, $path)) {
+                $count++;
+            }
+        }
+        
+        return ($count > 0) ? $count : FALSE;
     }
     
-    public function middleware() {
-        $this->middleware = func_get_args();
+    public function generateUrl(Array $data = array()) {
+        $count = 0;
         
-        return $this;
+        $regexp = array(
+            '/:[a-zA-Z_][a-zA-Z0-9_]*/' => '[\w]+',
+            '/\*/' => '.+'
+        );
+
+        // Prepare the string
+        $path = $this->path;
+        
+        if (count($data) > 0) {
+            // Replace the reqular expressions
+            foreach ($regexp as $key => $value) {
+                $path = preg_replace($key, $data[$count], $path);
+            }
+        }
+        
+        return $path;
     }
     
-    private function setName($value) {
-        $GLOBALS[$value] = $this;
+    protected function setName($value) {
         
         return $value;
     }
     
-    private function setMiddleware(Array $values) {
+    protected function setMiddleware(Array $values) {
         foreach ($values as $middleware) {
             if (!is_callable($callback)) {
                 throw new InvalidArgumentException('Middleware is not callable.');
