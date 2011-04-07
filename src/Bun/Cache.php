@@ -8,10 +8,10 @@
  *
  * @package Core
  */
-class Cache {    
-    private $id;
-    private $lifetime;
-    private $filename;
+class Cache extends Base {    
+    protected $id;
+    protected $lifetime;
+    protected $filename;
 
     /**
      * Create a new cache. 

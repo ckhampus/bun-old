@@ -1,5 +1,6 @@
 <?php
 
+require('Base.php');
 require('Cache.php');
 require('Route.php');
 
@@ -11,7 +12,7 @@ require('Route.php');
  *
  * @package Core
  */
-class Bun {
+class Bun extends Base{
     /**
      * True if a route has been matched.  
      * 

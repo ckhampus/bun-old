@@ -1,12 +1,33 @@
 <?php
 
+/**
+ * Base
+ *
+ * This is the base class all other classes extend.
+ * 
+ * @package Core
+ */
 abstract class Base {
     private $properties = array();
     
+    /**
+     * Add a public property to the class. 
+     * 
+     * @param string $name 
+     * @param mixed $value 
+     * @return void
+     */
     protected function addPublicProperty($name, $value = NULL) {
         $this->properties[$name] = $value;
     }
     
+    /**
+     * Magic setter function for properties. 
+     * 
+     * @param mixed $property 
+     * @param mixed $value 
+     * @return void
+     */
     public function __set($property, $value) {
         $methodname = 'set'.ucwords($property);
 
@@ -21,6 +42,12 @@ abstract class Base {
         }
     }
     
+    /**
+     * Magic getter function for properties. 
+     * 
+     * @param mixed $property 
+     * @return mixed
+     */
     public function __get($property) {
         $methodname = 'get'.ucwords($property);
 

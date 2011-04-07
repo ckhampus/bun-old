@@ -100,17 +100,43 @@ function render($template, $data = array()) {
     echo $GLOBALS['bun']->render('php', $template, $data); 
 }
 
+/**
+ * Set a name for the following route. 
+ * 
+ * @param string $name 
+ * @access public
+ * @return void
+ */
 function name($name) {
     $GLOBALS['bun']->setRouteName($name);
 }
 
+/**
+ * Return a route object by name. 
+ * 
+ * @param mixed $name 
+ * @access public
+ * @return Route
+ */
 function route($name) {
     return $GLOBALS['bun']->getRouteByName($name);
 }
 
+/**
+ * Returns the url for a named route. 
+ * 
+ * @param string $name 
+ * @param mixed $values 
+ * @access public
+ * @return string
+ */
 function urlFor($name, $values = array()) {
+    if (!is_array($values) && !empty(func_get_args())) {
+        $values = array_shift(func_get_args());
+    }
+    
     $route = $GLOBALS['bun']->getRouteByName($name);    
-    return $route->getPathWithValues($values);
+    return $route->getRealPath($values);
 }
 
 $GLOBALS['bun']->countRoutes();
