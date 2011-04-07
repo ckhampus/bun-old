@@ -2,7 +2,7 @@
 
 require('Base.php');
 
-class Route extends Base {    
+class Route extends Base { 
     function __construct($method, $path, $callback, $lifetime = 0) {
         if (!in_array(strtoupper($method), array('GET', 'POST', 'PUT', 'DELETE'))) {
             throw new InvalidArgumentException('Method not supported.');
@@ -34,51 +34,51 @@ class Route extends Base {
     }
     
     public function hasParameters() {
-        $count = 0;
-    
-        // Contains regular expressions to replace
-        $regexp = array(
-            '/:[a-zA-Z_][a-zA-Z0-9_]*/' => '[\w]+',
-            '/\*/' => '.+'
-        );
-
-        // Prepare the string
-        $path = str_replace('/', '\/', $this->path);
-        
-        // Replace the reqular expressions
-        foreach ($regexp as $key => $value) {
-            if (preg_match($key, $path)) {
-                $count++;
-            }
-        }
+        $count = count($this->getParameters());
         
         return ($count > 0) ? $count : FALSE;
     }
     
-    public function generateUrl(Array $data = array()) {
-        $count = 0;
+    public function getParameters() {
+        $matches = array();
+        $regexp = '/:[a-zA-Z_][a-zA-Z0-9_]*/';
+        $count = preg_match_all($regexp, $this->path, $matches);
         
-        $regexp = array(
-            '/:[a-zA-Z_][a-zA-Z0-9_]*/' => '[\w]+',
-            '/\*/' => '.+'
-        );
-
-        // Prepare the string
-        $path = $this->path;
-        
-        if (count($data) > 0) {
-            // Replace the reqular expressions
-            foreach ($regexp as $key => $value) {
-                $path = preg_replace($key, $data[$count], $path);
-            }
-        }
-        
-        return $path;
+        return $matches[0];
     }
     
-    protected function setName($value) {
+    /**
+     * Matches the route with the current path. 
+     * 
+     * @param string $path 
+     * @return bool
+     */
+    public function matchRoute($path)
+    {
+        // Matches the route with the current path
+        return preg_match(sprintf('/^%s$/', $this->getRealPath()), $path);
+    }
+    
+    public function getPathWithValues(Array $data = array()) {
+        return $this->getRealPath($data);
+    }
+    
+    protected function getRealPath(Array $values = array()) {
+        if (empty($values)) {
+            $path = str_replace('/', '\/', $this->path);
+            $values = array_fill_keys($this->getParameters(), '[\w]+');
+        } else {
         
-        return $value;
+            $path = $this->path;
+            $values = array_combine($this->getParameters(), $values);
+        }
+
+        // Replace the reqular expressions
+        foreach ($values as $key => $value) {
+            $path = str_replace($key, $value, $path);
+        }
+
+        return $path;
     }
     
     protected function setMiddleware(Array $values) {

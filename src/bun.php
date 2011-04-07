@@ -108,15 +108,9 @@ function route($name) {
     return $GLOBALS['bun']->getRouteByName($name);
 }
 
-function urlFor($name) {
-    $route = $GLOBALS['bun']->getRouteByName($name);
-    
-    $data = func_get_args();
-    array_shift($data);
-    
-    return $route->generateUrl($data);
+function urlFor($name, $values = array()) {
+    $route = $GLOBALS['bun']->getRouteByName($name);    
+    return $route->getPathWithValues($values);
 }
-
-
 
 $GLOBALS['bun']->countRoutes();

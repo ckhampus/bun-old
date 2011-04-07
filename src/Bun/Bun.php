@@ -122,7 +122,7 @@ class Bun {
             $cache = new Cache($route->path, $route->lifetime);   
 
             if ($route->method === $_SERVER['REQUEST_METHOD']) {
-                if ($this->matchRoute($route->path)) {
+                if ($route->matchRoute($this->requested_path)) {
                  
                     // Check if page is cached or not
                     if (!$cache->start()) {
@@ -283,32 +283,6 @@ class Bun {
 
         // Flush and return the buffer.
         return ob_get_clean();
-    }
-
-    /**
-     * Matches the route with the current path. 
-     * 
-     * @param string $path 
-     * @return bool
-     */
-    private function matchRoute($path)
-    {
-        // Contains regular expressions to replace
-        $regexp = array(
-            '/:[a-zA-Z_][a-zA-Z0-9_]*/' => '[\w]+',
-            '/\*/' => '.+'
-        );
-
-        // Prepare the string
-        $path = str_replace('/', '\/', $path);
-        
-        // Replace the reqular expressions
-        foreach ($regexp as $key => $value) {
-            $path = preg_replace($key, $value, $path);
-        }
-        
-        // Matches the route with the current path
-        return preg_match(sprintf('/^%s$/', $path), $this->requested_path);
     }
 
     /**
