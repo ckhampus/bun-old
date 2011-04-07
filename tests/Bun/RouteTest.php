@@ -20,4 +20,32 @@ class RouteTest extends PHPUnit_Extensions_OutputTestCase {
         $this->assertTrue(is_callable($route->callback));
         $this->assertEquals(0, $route->lifetime);
     }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRouteWithInvalidMethod() {
+        $route = new Route('HELLO', '/path', function(){}, 30);
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRouteWithInvalidPath() {
+        $route = new Route('GET', 'path', function(){}, 30);
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRouteWithInvalidCallback() {
+        $route = new Route('GET', '/path', 'nonExistantCallback', 30);
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRouteWithInvalidLifetime() {
+        $route = new Route('GET', '/path', function(){}, '30 seconds');
+    }
 }
